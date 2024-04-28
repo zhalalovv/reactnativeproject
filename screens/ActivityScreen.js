@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
-import { RNCamera } from 'react-native-camera';
-
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import QRScannerScreen from './QRScannerScreen';  // Убедитесь, что QRScannerScreen импортирован правильно
 
 const ActivityScreen = () => {
   const [activity, setActivity] = useState('');
   const [previousActivity, setPreviousActivity] = useState('');
+  const [scannerVisible, setScannerVisible] = useState(false);
 
   useEffect(() => {
     fetchRandomActivity();
@@ -23,31 +22,36 @@ const ActivityScreen = () => {
     }
   };
 
-  const handlePreviousActivity = () => {
-    setActivity(previousActivity);
+  const handleQRCodeScanned = (data) => {
+    console.log('Scanned data:', data);
+    setActivity(data);
+    setScannerVisible(false);  // Закрыть сканер после сканирования
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/timoha.jpg')} // Путь к вашему изображению
-        style={styles.image}
-      />
-      {activity &&
-        <QRCode style={styles.qrcode}
-          value={activity}
-        />}
       <Text style={styles.activityText}>Случайная активность: {activity}</Text>
       <TouchableOpacity style={styles.button} onPress={fetchRandomActivity}>
         <Text style={styles.buttonText}>Перейти к следующей активности</Text>
       </TouchableOpacity>
-      {previousActivity ? (
-        <TouchableOpacity style={styles.button} onPress={handlePreviousActivity}>
+      {previousActivity && (
+        <TouchableOpacity style={styles.button} onPress={() => setActivity(previousActivity)}>
           <Text style={styles.buttonText}>Вернуться к предыдущей активности</Text>
         </TouchableOpacity>
-      ) : (
-        <Text style={styles.noPreviousActivityText}>Нет предыдущей активности</Text>
       )}
+      <TouchableOpacity style={styles.button} onPress={() => setScannerVisible(true)}>
+        <Text style={styles.buttonText}>Сканировать QR код</Text>
+      </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={scannerVisible}
+        onRequestClose={() => {
+          setScannerVisible(false);
+        }}
+      >
+        <QRScannerScreen onCodeDetected={handleQRCodeScanned} />
+      </Modal>
     </View>
   );
 };
@@ -77,20 +81,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  noPreviousActivityText: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: 'gray',
-  },
-  image: {
-    width: 300, // Укажите нужную ширину
-    height: 300,
-    marginBottom: 20, // Укажите нужную высоту
-  },
-  qrcode: {
-    size: 200,
-    marginBottom: 15,
-  }
 });
 
 export default ActivityScreen;
