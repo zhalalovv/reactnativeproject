@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import QRScannerScreen from './QRScannerScreen';  // Убедитесь, что QRScannerScreen импортирован правильно
+import QRCode from 'react-native-qrcode-svg';
+import QRScannerScreen from './QRScannerScreen';
 
 const ActivityScreen = () => {
   const [activity, setActivity] = useState('');
@@ -30,6 +31,17 @@ const ActivityScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Отображение QR кода для текущей активности */}
+      {activity && (
+        <View style={styles.qrCodeContainer}>
+          <QRCode
+            value={activity}
+            size={200}
+            color="black"
+            backgroundColor="white"
+          />
+        </View>
+      )}
       <Text style={styles.activityText}>Случайная активность: {activity}</Text>
       <TouchableOpacity style={styles.button} onPress={fetchRandomActivity}>
         <Text style={styles.buttonText}>Перейти к следующей активности</Text>
@@ -81,6 +93,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  qrCodeContainer: {
+    marginBottom: 15,
+  }
 });
 
 export default ActivityScreen;
