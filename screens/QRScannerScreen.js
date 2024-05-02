@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useDispatch } from 'react-redux';
-import { setQRData, setActivity } from './actions';
+import { setQRData, setActivity } from '../redux/actions';
 import { useNavigation } from '@react-navigation/native';
 
 export default function QRScannerScreen() {

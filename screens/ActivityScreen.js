@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useSelector, useDispatch } from 'react-redux';
-import { setActivity, setPreviousActivity } from './actions';
+import { setActivity, setPreviousActivity } from '../redux/actions';
 
 const ActivityScreen = ({ navigation }) => {
   const dispatch = useDispatch();
