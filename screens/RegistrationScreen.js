@@ -27,14 +27,14 @@ export default function RegistrationScreen({ navigation }) {
 
             await AsyncStorage.setItem(username, password);
             Alert.alert('Пользователь успешно зарегистрирован');
-            navigation.navigate('Login'); // Переход на экран входа после успешной регистрации
+            navigation.navigate('Login');
         } catch (error) {
             console.error('Ошибка при регистрации пользователя:', error.message);
         }
     };
 
     const handleLoginNavigation = () => {
-        navigation.navigate('Login'); // Переход на экран входа
+        navigation.navigate('Login');
     };
 
     return (

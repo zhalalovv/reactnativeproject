@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
+        setLoading(true);
         try {
             const savedPassword = await AsyncStorage.getItem(username);
             if (savedPassword === password) {
                 await AsyncStorage.setItem('userToken', 'true');
-                navigation.navigate('Activity'); // Перенаправление на экран ActivityScreen после успешного входа
+                navigation.navigate('Activity');
             } else {
-                alert('Неверное имя пользователя или пароль');
+                Alert.alert('Ошибка входа', 'Неверное имя пользователя или пароль');
             }
         } catch (error) {
-            console.error('Ошибка при входе:', error.message);
+            Alert.alert('Ошибка входа', 'Произошла ошибка при попытке входа: ' + error.message);
+        } finally {
+            setLoading(false);
         }
-    };
-
-    const handleRegistrationNavigation = () => {
-        navigation.navigate('Registration');
     };
 
     return (
@@ -39,10 +39,14 @@ const LoginScreen = ({ navigation }) => {
                 value={password}
                 onChangeText={setPassword}
             />
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Войти</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleRegistrationNavigation}>
+            {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                    <Text style={styles.buttonText}>Войти</Text>
+                </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
                 <Text style={styles.registrationText}>Нет аккаунта? Зарегистрироваться</Text>
             </TouchableOpacity>
         </View>
@@ -75,10 +79,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#fff',
-        fontSize: 16,
-    },
-    registrationText: {
-        color: '#007bff',
         fontSize: 16,
     },
     registrationText: {

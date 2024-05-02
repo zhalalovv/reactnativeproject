@@ -1,37 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import QRScannerScreen from './QRScannerScreen';
+import { useSelector, useDispatch } from 'react-redux';
+import { setActivity, setPreviousActivity } from './actions';
 
-const ActivityScreen = () => {
-  const [activity, setActivity] = useState('');
-  const [previousActivity, setPreviousActivity] = useState('');
-  const [scannerVisible, setScannerVisible] = useState(false);
+const ActivityScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const { activity, previousActivity } = useSelector(state => state);
 
   useEffect(() => {
-    fetchRandomActivity();
+    if (!activity) {
+      fetchRandomActivity();
+    }
   }, []);
 
   const fetchRandomActivity = async () => {
     try {
       const response = await fetch('https://www.boredapi.com/api/activity/');
       const data = await response.json();
-      setPreviousActivity(activity);
-      setActivity(data.activity);
+      dispatch(setPreviousActivity(activity));
+      dispatch(setActivity(data.activity));
     } catch (error) {
       console.error('Ошибка при получении активности:', error);
     }
   };
 
-  const handleQRCodeScanned = (data) => {
-    console.log('Scanned data:', data);
-    setActivity(data);
-    setScannerVisible(false);  // Закрыть сканер после сканирования
-  };
-
   return (
     <View style={styles.container}>
-      {/* Отображение QR кода для текущей активности */}
       {activity && (
         <View style={styles.qrCodeContainer}>
           <QRCode
@@ -47,23 +42,13 @@ const ActivityScreen = () => {
         <Text style={styles.buttonText}>Перейти к следующей активности</Text>
       </TouchableOpacity>
       {previousActivity && (
-        <TouchableOpacity style={styles.button} onPress={() => setActivity(previousActivity)}>
+        <TouchableOpacity style={styles.button} onPress={() => dispatch(setActivity(previousActivity))}>
           <Text style={styles.buttonText}>Вернуться к предыдущей активности</Text>
         </TouchableOpacity>
       )}
-      <TouchableOpacity style={styles.button} onPress={() => setScannerVisible(true)}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('QRScanner')}>
         <Text style={styles.buttonText}>Сканировать QR код</Text>
       </TouchableOpacity>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={scannerVisible}
-        onRequestClose={() => {
-          setScannerVisible(false);
-        }}
-      >
-        <QRScannerScreen onCodeDetected={handleQRCodeScanned} />
-      </Modal>
     </View>
   );
 };
@@ -87,11 +72,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   qrCodeContainer: {
     marginBottom: 15,
